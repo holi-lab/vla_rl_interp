@@ -5,6 +5,7 @@
   --link: #2869c7;
   --border: #dcdde3;
   --surface: #f5f5f7;
+  --reading-width: 660px;
 }
 * { box-sizing: border-box; }
 html { scroll-padding-top: 70px; }
@@ -93,6 +94,13 @@ main > .hero { padding: 0; }
 .citation-actions button:hover { background: var(--surface); }
 pre { margin: 0; padding: 20px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
 .copy-status { margin: 8px 0 0; min-height: 20px; font-size: 13px; color: var(--muted); }
+/* Keep prose compact while giving figures and tables room for their labels. */
+.tldr, main > section > h2, main > section > h3,
+main > section > p, .citation-heading, .result-details, pre {
+  max-width: var(--reading-width);
+  margin-left: auto;
+  margin-right: auto;
+}
 @media (max-width: 880px) {
   .brand { display: none; }
   .topbar-inner { justify-content: center; }
