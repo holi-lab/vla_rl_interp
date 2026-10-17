@@ -59,16 +59,16 @@
       </div>
       <div class="tldr">
         <h2>TL;DR</h2>
-        <p>Reinforcement learning (RL) produces <strong>low-rank updates concentrated in the Timestep Modules</strong> of flow-based vision-language-action (VLA) models. These modules capture a disproportionate share of the RL gains. We trace this structure to discrete denoising timesteps and show how the learned shift directions encode information about task outcomes and cross-task transfer. Steering along these directions further improves trained policies.</p>
+        <p>Reinforcement learning (RL) concentrates <strong>low-rank updates in the Timestep Modules</strong> of the flow-based vision-language-action (VLA) models we study. These modules account for a disproportionate share of the RL gains. We trace the low-rank structure to training at discrete denoising timesteps. Projections onto the learned shift directions predict episode outcomes, while similarities between these directions correlate with cross-task transfer. Steering along them further improves trained policies.</p>
       </div>
     </section>
 
     <section id="overview" aria-labelledby="overview-title">
       <h2 id="overview-title">What is this paper about?</h2>
-      <p>We investigate <strong>where and how RL learning signals are encoded in VLA parameters</strong>. Across π<sub>0.5</sub> and GR00T N1.5/N1.6 on LIBERO, ManiSkill, MetaWorld, and CALVIN, we connect parameter changes to performance through controlled module-replacement experiments.</p>
-      <p>The key finding is that much of RL adaptation can be understood as <strong>timestep-specific vector modulation of the action expert’s hidden states</strong>. We explain how discrete training timesteps give rise to the low-rank updates, then examine the information encoded in their shift directions through outcome prediction, task-transfer analysis, and steering.</p>
+      <p>We study <strong>where and how RL learning signals are encoded in VLA parameters</strong>. We analyze π<sub>0.5</sub> and GR00T N1.5/N1.6 on LIBERO, ManiSkill, MetaWorld, and CALVIN, and use controlled module replacement to test which parameter updates account for the performance gains.</p>
+      <p>Our analysis links much of RL adaptation to <strong>timestep-specific vectors that modulate the action expert’s hidden states</strong>. We show that training at discrete denoising timesteps produces low-rank updates to the modules that generate these vectors. We then examine what the shift directions encode through episode-outcome prediction and cross-task transfer analysis, and use them to steer trained policies.</p>
       <h3>What are Timestep Modules?</h3>
-      <p>In π<sub>0.5</sub>, a Time MLP and adaptive RMS normalization (AdaRMS) projections convert the denoising timestep into <strong>scale, shift, and gate vectors</strong> for each attention or feed-forward sublayer. These vectors depend only on the timestep, independent of the image, language instruction, or current task progress.</p>
+      <p>In π<sub>0.5</sub>, the Time MLP and adaptive RMS normalization (AdaRMS) projections map the denoising timestep to <strong>scale, shift, and gate vectors</strong> for each attention or feed-forward sublayer. These vectors depend only on the timestep, so they are independent of the image, language instruction, and current task progress.</p>
       <figure class="figure" id="timestep-modules">
         <a href="assets/main_timestep_modules.svg" target="_blank" rel="noopener" aria-label="Open the Timestep Modules diagram at full size">
           <img src="assets/main_timestep_modules.svg" width="975" height="407" alt="In the π0.5 action expert, the timestep passes through a Time MLP and AdaRMS projections to produce scale, shift, and gate vectors for attention and feed-forward sublayers.">
@@ -79,7 +79,7 @@
 
     <section id="updates" aria-labelledby="updates-title">
       <h2 id="updates-title">Where are the RL updates concentrated?</h2>
-      <p>Both behavior cloning (BC) and RL update the Timestep Modules much more densely than attention and MLP layers. Their update structure differs: in π<sub>0.5</sub>, RL updates to the Timestep Modules have an effective rank of only about <strong>6–30</strong>, compared with hundreds for BC. RL updates to attention and MLP layers remain high-rank.</p>
+      <p>Both behavior cloning (BC) and RL change a larger fraction of parameters in the Timestep Modules than in attention and MLP layers. However, in π<sub>0.5</sub>, the RL updates to the Timestep Modules have an effective rank of about <strong>6–30</strong>, compared with hundreds for BC. RL updates to attention and MLP layers remain high-rank.</p>
       <div class="update-figures">
         <figure class="figure" id="update-density">
           <a class="figure-crop density-panel" href="assets/pi05_density_rank_spaced_labels.png" target="_blank" rel="noopener" aria-label="Open the update density figure at full size">
@@ -98,7 +98,7 @@
       </div>
 
       <h3>Do these updates account for the performance gains?</h3>
-      <p>Starting from each RL checkpoint, we keep the learned Timestep Modules and restore the remaining parameters to the base policy, or do the reverse. For π<sub>0.5</sub>, keeping only the Timestep Module updates recovers nearly all of the RL performance across four benchmarks. The effect varies by model: GR00T N1.5 retains a smaller fraction of the gain.</p>
+      <p>To test which updates contribute to performance, we retain either the Timestep Module updates or the attention and MLP updates, restoring all other parameters to the base checkpoint. In π<sub>0.5</sub>, the Timestep Module updates alone recover nearly all of the RL performance across four benchmarks. GR00T N1.5 retains a smaller fraction of the gain.</p>
       <div class="table-scroll" role="region" aria-label="Module replacement success rates" tabindex="0">
         <table class="data-table module-table" data-source="S3.T1">
           <caption>Module replacement: success rate (%)</caption>
@@ -118,7 +118,7 @@
 
     <section id="timesteps" aria-labelledby="timesteps-title">
       <h2 id="timesteps-title">Why are the updates low-rank?</h2>
-      <p>Standard BC samples continuous denoising timesteps, whereas RL trains at the discrete timesteps used during rollouts. In π<sub>0.5</sub>, RL specializes the Timestep Modules to these discrete inputs. <strong>Training BC with discrete timesteps produces similar specialization and low-rank updates</strong>, identifying the timestep schedule as a source of the structure.</p>
+      <p>Standard BC samples continuous denoising timesteps, while RL trains at the discrete timesteps used during rollouts. In π<sub>0.5</sub>, the Timestep Modules become specialized to these discrete inputs. <strong>BC trained at discrete timesteps shows similar specialization and low-rank updates</strong>. This control links the low-rank structure to the timestep schedule.</p>
       <figure class="figure single-panel" id="timestep-specialization">
         <a class="figure-crop specialization-panel" href="assets/main_rl5_bc_discrete_bc_and_modulation.png" target="_blank" rel="noopener" aria-label="Open the timestep specialization figure at full size">
           <img src="assets/main_rl5_bc_discrete_bc_and_modulation.png" width="1090" height="460" loading="lazy" alt="RL and BC trained at five discrete timesteps show localized responses at the training timesteps; standard BC has smoother responses.">
@@ -130,7 +130,7 @@
     <section id="shifts" aria-labelledby="shifts-title">
       <h2 id="shifts-title">What do the shift directions encode?</h2>
       <h3 class="first-subheading">Why focus on shift vectors?</h3>
-      <p>Scale and gate updates tend to align with their base outputs, largely rescaling existing directions. <strong>Shift updates are less aligned</strong>, introducing more distinct directions into the hidden states. This motivates examining what those directions encode.</p>
+      <p>Scale and gate updates largely align with their base outputs and rescale existing directions. <strong>Shift updates are less aligned</strong> and change the direction of the vector added to the hidden states. We therefore examine what information these shift directions encode.</p>
       <figure class="figure single-panel" id="modulation-directions">
         <a class="figure-crop modulation-panel" href="assets/main_rl5_bc_discrete_bc_and_modulation.png" target="_blank" rel="noopener" aria-label="Open the scale, shift, and gate comparison at full size">
           <img src="assets/main_rl5_bc_discrete_bc_and_modulation.png" width="1090" height="460" loading="lazy" alt="Shift updates have lower absolute cosine similarity with the base modulation vectors than scale and gate updates in π0.5 on MetaWorld.">
@@ -138,8 +138,8 @@
         <figcaption>Absolute cosine similarity between each base modulation vector and its RL update in π<sub>0.5</sub> on MetaWorld. Lower similarity indicates a more distinct update direction. <a class="source" href="https://arxiv.org/html/2609.34599v1#S4.F3">Figure 3, right</a> · <a href="assets/main_rl5_bc_discrete_bc_and_modulation.png" target="_blank" rel="noopener">Full size</a></figcaption>
       </figure>
       <h3 id="episode-outcomes">Episode outcomes</h3>
-      <p>For each sublayer–timestep pair, we take the shift update Δb = b<sub>RL</sub> − b<sub>base</sub>, project the corresponding input hidden states onto it, and average the scores over each episode. A regularized logistic regression probe combines these scores across sublayers and timesteps to predict success or failure.</p>
-      <p>Using a 70:30 split of tasks within each benchmark, the probes predict outcomes on held-out tasks for both base and RL π<sub>0.5</sub> policies. ROC-AUC reaches <strong>99.6%</strong> for the base policy on LIBERO-Spatial and ManiSkill, with performance varying across benchmarks and policies.</p>
+      <p>To test whether shift directions encode episode outcomes, we project the input hidden states at each sublayer–timestep pair onto its shift update, Δb = b<sub>RL</sub> − b<sub>base</sub>, and average the projection scores over each episode. A regularized logistic regression probe combines the scores across sublayers and timesteps to predict success or failure.</p>
+      <p>We split tasks 70:30 within each benchmark and evaluate the probes on held-out tasks for both base and RL π<sub>0.5</sub> policies. For the base policy, ROC-AUC reaches <strong>99.6%</strong> on LIBERO-Spatial and ManiSkill. The scores vary across benchmarks and policies.</p>
       <div class="table-scroll" role="region" aria-label="Outcome prediction ROC-AUC" tabindex="0">
         <table class="data-table" data-source="S5.T2">
           <caption>Episode-outcome prediction: ROC-AUC (%)</caption>
@@ -173,7 +173,7 @@
       </details>
 
       <h3 id="task-relationships">Relationships between tasks</h3>
-      <p>We also train ten separate π<sub>0.5</sub> policies on individual LIBERO-Spatial tasks. Tasks with similar shift-update directions tend to show similar cross-task transfer patterns. The mean task-wise Spearman correlation between the two similarity profiles is <strong>0.504</strong>, ranging from 0.224 to 0.794.</p>
+      <p>To examine task relationships, we train ten separate π<sub>0.5</sub> policies on individual LIBERO-Spatial tasks. Tasks with similar shift-update directions tend to have similar cross-task transfer patterns. The task-wise Spearman correlation between the two similarity profiles averages <strong>0.504</strong> and ranges from 0.224 to 0.794.</p>
       <div class="task-figures">
         <figure class="figure">
           <a class="figure-crop task-alignment-panel" href="assets/main_taskvec.png" target="_blank" rel="noopener" aria-label="Open the shift-update alignment matrix at full size">
@@ -192,8 +192,8 @@
 
     <section id="steering" aria-labelledby="steering-title">
       <h2 id="steering-title">Steering an already trained policy</h2>
-      <p>Can these directions improve behavior? We select a sublayer–timestep pair using probing performance on the training tasks. When its hidden-state projection deviates from the successful-episode mean, we steer along the learned shift direction by the minimum amount needed to reach that mean.</p>
-      <p>This adaptive intervention improves the RL π<sub>0.5</sub> policy by <strong>2.0–4.0 percentage points</strong> across five benchmarks, outperforming matched-norm random directions. It uses probes and successful-episode statistics from the training split, without additional RL training.</p>
+      <p>We use the learned shift directions to steer an RL-trained policy. Probing performance on the training tasks determines which sublayer–timestep pair to use. At that pair, we move the hidden states along the shift direction by the minimum amount needed to bring their projection to the successful-episode mean.</p>
+      <p>Steering improves the RL π<sub>0.5</sub> policy's success rate by <strong>2.0–4.0 percentage points</strong> across five benchmarks and outperforms matched-norm random directions. The probes and successful-episode statistics come from the training split; steering requires no additional RL training.</p>
       <div class="table-scroll" role="region" aria-label="Adaptive steering success rates" tabindex="0">
         <table class="data-table steering-table" data-source="S5.T3">
           <caption>Adaptive steering: success rate (%)</caption>
