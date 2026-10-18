@@ -28,20 +28,28 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap">
   <link rel="stylesheet" href="assets/site.css?v=48aaba0">
   <script src="assets/site.js" defer></script>
+  <link rel="stylesheet" href="assets/page-toc.css?v=1">
+  <script src="assets/page-toc.js?v=1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#overview">Skip to content</a>
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="#top">VLA Reinforcement Learning</a>
-      <nav aria-label="Page sections">
-        <a href="#overview">Overview</a>
-        <a href="#updates">Updates</a>
-        <a href="#timesteps">Timesteps</a>
-        <a href="#shifts">Shift vectors</a>
-        <a href="#steering">Steering</a>
-        <a href="#bibtex">BibTeX</a>
-      </nav>
+      <details class="page-toc" open>
+        <summary>Contents <span class="toc-current" aria-hidden="true"></span></summary>
+        <nav aria-label="Table of contents">
+          <p class="toc-title">Contents</p>
+          <a href="#top">Top</a>
+          <a href="#tldr">TL;DR</a>
+          <a href="#overview">Overview</a>
+          <a href="#updates">Updates</a>
+          <a href="#timesteps">Timesteps</a>
+          <a href="#shifts">Shift vectors</a>
+          <a href="#steering">Steering</a>
+          <a href="#bibtex">BibTeX</a>
+        </nav>
+      </details>
     </div>
   </header>
 
@@ -59,7 +67,7 @@
           <a class="button secondary" href="#bibtex">BibTeX</a>
         </div>
       </div>
-      <div class="tldr">
+      <div class="tldr" id="tldr">
         <h2>TL;DR</h2>
         <p>Reinforcement learning (RL) concentrates <strong>low-rank updates in the Timestep Modules</strong> of the flow-based vision-language-action (VLA) models we study. These modules account for a disproportionate share of the RL gains. We trace the low-rank structure to training at discrete denoising timesteps. Projections onto the learned shift directions predict episode outcomes, while similarities between these directions correlate with cross-task transfer. Steering along them further improves trained policies.</p>
       </div>
